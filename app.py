@@ -10,19 +10,18 @@ openai.api_key = os.getenv("API_Key_Calv")
 
 @app.route("/api/critique", methods=["POST"])
 def critique():
-    if "image" not in request.files:
+    # Updated line: safer access than request.files["image"]
+    file = request.files.get("image")
+    style = request.form.get("style", "")
+    prompt = request.form.get("prompt", "")
+
+    if file is None or file.filename == "":
         return jsonify({"error": "No valid image uploaded"}), 400
 
-    file = request.files["image"]
-    style = request.form.get("style", "")
-
-    if file.filename == "":
-        return jsonify({"error": "Empty filename"}), 400
-
     try:
-        img = Image.open(file.stream).convert("RGB")  # Support all formats, especially JPG
+        img = Image.open(file.stream).convert("RGB")  # Load image
         buffered = BytesIO()
-        img.save(buffered, format="JPEG")  # Save as JPEG for universal support
+        img.save(buffered, format="JPEG")
         b64_img = base64.b64encode(buffered.getvalue()).decode()
         image_mime = "image/jpeg"
 
@@ -34,7 +33,7 @@ def critique():
                     "role": "user",
                     "content": [
                         {"type": "image_url", "image_url": {"url": f"data:{image_mime};base64,{b64_img}"}},
-                        {"type": "text", "text": "Please critique this artwork."}
+                        {"type": "text", "text": prompt or "Please critique this artwork."}
                     ]
                 }
             ],
