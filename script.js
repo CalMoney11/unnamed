@@ -7,20 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!form) return;
 
-  // Preview image and validate file
+  // Show image preview
   fileInput.addEventListener('change', () => {
     const file = fileInput.files[0];
-    if (!file) return;
-
-    const allowedTypes = ['image/jpeg', 'image/png'];
-    if (!allowedTypes.includes(file.type)) {
-      warningBox.textContent = "Only JPG and PNG files are allowed.";
-      fileInput.value = "";
-      preview.style.display = "none";
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
+    if (file && file.size > 5 * 1024 * 1024) {
       warningBox.textContent = "File exceeds 5MB limit.";
       fileInput.value = "";
       preview.style.display = "none";
@@ -41,8 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const prompt = document.getElementById('art').value.trim();
-    const style = document.getElementById('style').value.trim();
+    const prompt = document.getElementById('art').value;
+    const style = document.getElementById('style').value;
     const file = fileInput.files[0];
 
     if (!file) {
@@ -53,10 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const formData = new FormData();
     formData.append('prompt', prompt);
     formData.append('style', style);
-    formData.append('image', file);  // This must match Flask: request.files.get('image')
+    formData.append('image', file);
 
     responseBox.textContent = "Analyzing artwork... Please wait.";
-    warningBox.textContent = "";
 
     try {
       const res = await fetch('https://unnamed-94574790644.us-west1.run.app/api/critique', {
@@ -68,10 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!res.ok) {
         console.error("Server returned error response:", data);
-        throw new Error(`Server returned ${res.status}: ${data.error || 'Unknown error'}`);
+        throw new Error(`Server returned ${res.status}: ${data.error}`);
       }
 
-      responseBox.textContent = data.critique || "No critique returned.";
+      responseBox.textContent = data.critique || JSON.stringify(data, null, 2);
     } catch (err) {
       console.error("Submission error:", err);
       responseBox.textContent = "An error occurred while submitting your artwork. Check the console for details.";
