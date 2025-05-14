@@ -1,3 +1,7 @@
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('critique-form');
+
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -36,4 +40,6 @@ form.addEventListener('submit', async (e) => {
     console.error("Submission error:", err);
     responseBox.textContent = "An error occurred while submitting your artwork. Check the console for details.";
   }
+});
+
 });
