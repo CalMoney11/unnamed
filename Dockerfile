@@ -26,3 +26,8 @@ RUN echo "[DEBUG] Verifying openai install:" && \
 
 # Run the Flask app
 CMD ["python", "app.py"]
+
+
+ENV OPENAI_API_KEY=$_OPENAI_API_KEY
+ENV OPENAI_PROJECT_ID=$_OPENAI_PROJECT_ID
+ENV OPENAI_ORG_ID=$_OPENAI_ORG_ID
