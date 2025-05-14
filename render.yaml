@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: art-buddy-api
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: API_Key_Calv
