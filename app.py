@@ -1,84 +1,50 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
-from openai import OpenAI
+from PIL import Image
+import openai
 import os
-import prompts
 import base64
-from werkzeug.utils import secure_filename
-
-client = OpenAI(api_key=os.getenv("API_Key_Calv"))
+from io import BytesIO
 
 app = Flask(__name__)
-CORS(app, origins=["https://unnamed-dev2.github.io"])
-
-UPLOAD_FOLDER = "uploads"
-MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB limit
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
-
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def encode_image_to_base64(filepath):
-    with open(filepath, "rb") as img_file:
-        return base64.b64encode(img_file.read()).decode("utf-8")
+openai.api_key = os.getenv("API_Key_Calv")
 
 @app.route("/api/critique", methods=["POST"])
 def critique():
-    filepath = None
+    if "image" not in request.files:
+        return jsonify({"error": "No valid image uploaded"}), 400
+
+    file = request.files["image"]
+    style = request.form.get("style", "")
+
+    if file.filename == "":
+        return jsonify({"error": "Empty filename"}), 400
+
     try:
-        prompt = request.form.get("prompt", "")
-        style = request.form.get("style", "surrealism")
-        file = request.files.get("image")
+        img = Image.open(file.stream).convert("RGB")  # Support all formats, especially JPG
+        buffered = BytesIO()
+        img.save(buffered, format="JPEG")  # Save as JPEG for universal support
+        b64_img = base64.b64encode(buffered.getvalue()).decode()
+        image_mime = "image/jpeg"
 
-        if not file or not allowed_file(file.filename):
-            return jsonify({"error": "No valid image uploaded"}), 400
-
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-        file.save(filepath)
-
-        base64_image = encode_image_to_base64(filepath)
-        user_prompt = prompts.generate_prompt(prompt, style)
-
-        print("Prompt:", user_prompt)
-        print("Base64 image length:", len(base64_image))
-
-        response = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-4-vision-preview",
             messages=[
-                {"role": "system", "content": prompts.system_message},
+                {"role": "system", "content": f"You are an art critic specializing in {style}."},
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": user_prompt},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/jpeg;base64,{base64_image}"
-                            }
-                        }
+                        {"type": "image_url", "image_url": {"url": f"data:{image_mime};base64,{b64_img}"}},
+                        {"type": "text", "text": "Please critique this artwork."}
                     ]
                 }
             ],
-            max_tokens=800,
-            timeout=60
+            max_tokens=500
         )
 
-        critique = response.choices[0].message.content
-        return jsonify({"critique": critique})
+        return jsonify({"critique": response.choices[0].message["content"]})
 
     except Exception as e:
-        print("Error during critique:", str(e))
         return jsonify({"error": str(e)}), 500
 
-    finally:
-        if filepath and os.path.exists(filepath):
-            os.remove(filepath)
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=8080)
