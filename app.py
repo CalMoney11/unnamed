@@ -44,6 +44,10 @@ def critique():
         base64_image = encode_image_to_base64(filepath)
         user_prompt = prompts.generate_prompt(prompt, style)
 
+        print("Prompt:", user_prompt)
+        print("Base64 image length:", len(base64_image))
+
+
         response = client.chat.completions.create(
             model="gpt-4-vision-preview",
             messages=[
