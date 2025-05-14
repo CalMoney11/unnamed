@@ -1,0 +1,95 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f4f4f4;
+  color: #222;
+  margin: 0;
+}
+header {
+  background: #1e1e1e;
+  color: white;
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+}
+h1 {
+  margin: 0;
+  font-size: 3rem;
+}
+.subtitle {
+  font-size: 1.25rem;
+  color: #ccc;
+  margin-top: 0.5rem;
+}
+.chat-container {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 1rem;
+  background: white;
+  min-height: 60vh;
+}
+form {
+  width: 100%;
+  max-width: 800px;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+textarea, input[type="text"] {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+input[type="file"] {
+  width: 100%;
+  padding: 1rem;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+input[type="file"]:hover {
+  border-color: #999;
+  background-color: #f0f0f0;
+}
+#file-warning {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+button {
+  background-color: #1e1e1e;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+#response {
+  margin-top: 2rem;
+  white-space: pre-wrap;
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+#preview {
+  max-width: 100%;
+  margin-top: 10px;
+  display: none;
+  border-radius: 8px;
+}
+footer {
+  text-align: center;
+  padding: 2rem;
+  font-size: 0.9rem;
+  background-color: #f0f0f0;
+  color: #777;
+}
