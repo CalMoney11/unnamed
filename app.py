@@ -10,7 +10,12 @@ openai.api_key = os.getenv("API_Key_Calv")
 
 @app.route("/api/critique", methods=["POST"])
 def critique():
+    print("Request received at /api/critique")
+    print("Request.files keys:", request.files.keys())
+    print("Request.form keys:", request.form.keys())
+
     if "image" not in request.files:
+        print("Image not found in request.files")
         return jsonify({"error": "No valid image uploaded"}), 400
 
     file = request.files["image"]
