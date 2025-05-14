@@ -12,7 +12,7 @@ app = Flask(__name__)
 CORS(app, origins=["https://unnamed-dev2.github.io"])
 
 UPLOAD_FOLDER = "uploads"
-MAX_CONTENT_LENGTH = 5 * 1024 * 1024
+MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB limit
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -30,9 +30,9 @@ def encode_image_to_base64(filepath):
 @app.route("/api/critique", methods=["POST"])
 def critique():
     try:
-        art = request.form.get("art", "")
+        prompt = request.form.get("prompt", "")
         style = request.form.get("style", "surrealism")
-        file = request.files.get("file", None)
+        file = request.files.get("image")
 
         if not file or not allowed_file(file.filename):
             return jsonify({"error": "No valid image uploaded"}), 400
@@ -42,7 +42,7 @@ def critique():
         file.save(filepath)
 
         base64_image = encode_image_to_base64(filepath)
-        user_prompt = prompts.generate_prompt(art, style)
+        user_prompt = prompts.generate_prompt(prompt, style)
 
         response = client.chat.completions.create(
             model="gpt-4-vision-preview",
