@@ -4,31 +4,36 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Art Buddy – AI Art Critique</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="frontend/style.css" />
 </head>
 <body>
 <header>
   <h1>Art Buddy</h1>
   <p class="subtitle">Your AI Art Critique Companion</p>
 </header>
+
 <section class="chat-container">
   <form id="critique-form">
     <label>How would you like me to critique your artwork?
       <textarea id="art" rows="4" placeholder="e.g., Focus on composition, color, or mood..."></textarea>
     </label>
+
     <label>Upload your artwork (JPG or PNG, max 5MB):
       <input type="file" id="file" name="image" accept="image/png, image/jpeg" />
     </label>
     <div id="file-warning"></div>
-    <img id="preview" />
+    <img id="preview" style="max-width: 100%; display: none;" />
+
     <label>Style (e.g., surrealism, brutalism):
       <input id="style" type="text" placeholder="e.g., surrealism" />
     </label>
+
     <button type="submit">Get Critique</button>
-    <div id="response"></div>
+    <div id="response" style="white-space: pre-wrap;"></div>
   </form>
 </section>
+
 <footer>&copy; 2025 Art Buddy – Designed for artists, students, and creatives.</footer>
-<script src="script.js"></script>
+<script src="frontend/index.js"></script>
 </body>
 </html>

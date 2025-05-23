@@ -1,0 +1,6 @@
+Flask
+functions-framework
+flask-cors
+openai
+Pillow
+python-multipart

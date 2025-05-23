@@ -1,6 +1,0 @@
-Flask
-flask-cors
-Pillow
-openai
-python-dotenv
-python-multipart

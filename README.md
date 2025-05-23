@@ -2,14 +2,16 @@ this file structure is as follows
 
 |---unnamed/
     |-- backend/
-        |-- app.py
+        |-- main.py
         |-- prompts.py
         |-- requirments.txt
-        |-- render.yaml
     
     |-- frontend/
-        |-- index.html
-|-- README.md
+        |--index.js
+        |--style.css
+    
+    |-- index.html
+    |-- README.md
 
 this is a python based gpt using openai's api
 
