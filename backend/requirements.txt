@@ -1,6 +1,6 @@
 Flask
 functions-framework
 flask-cors
-openai
+openai==0.28
 Pillow
 python-multipart
