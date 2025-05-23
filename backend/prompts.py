@@ -18,3 +18,18 @@ def generate_prompt(art_description: str, critique_style: str = "constructive"):
         f"Description: {art_description}\n"
         f"Include strengths, areas for improvement, and questions the artist might consider."
     )
+
+def format_openai_messages(prompt: str):
+    """
+    Formats a prompt string into a list of OpenAI-compatible messages.
+
+    Parameters:
+        prompt (str): A full text prompt to convert into a message format.
+
+    Returns:
+        list: A list of dicts in OpenAI's chat message format.
+    """
+    return [
+        {"role": "system", "content": system_message},
+        {"role": "user", "content": prompt}
+    ]
