@@ -55,7 +55,7 @@ def generate_art_critique(request):
 
         # Call OpenAI API
         response = openai.ChatCompletion.create(
-            model="gpt-4-vision-preview",
+            model="gpt-4o",
             messages=messages,
             max_tokens=500
         )
