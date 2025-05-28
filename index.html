@@ -2,38 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Art Buddy – AI Art Critique</title>
-  <link rel="stylesheet" href="frontend/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Art Critique</title>
 </head>
 <body>
-<header>
-  <h1>Art Buddy</h1>
-  <p class="subtitle">Your AI Art Critique Companion</p>
-</header>
+  <h1>AI Art Critique</h1>
 
-<section class="chat-container">
   <form id="critique-form">
-    <label>How would you like me to critique your artwork?
-      <textarea id="art" rows="4" placeholder="e.g., Focus on composition, color, or mood..."></textarea>
-    </label>
+    <label for="file">Upload Image:</label>
+    <input type="file" id="file" name="file" required><br><br>
 
-    <label>Upload your artwork (JPG or PNG, max 5MB):
-      <input type="file" id="file" name="image" accept="image/png, image/jpeg" />
-    </label>
-    <div id="file-warning"></div>
-    <img id="preview" style="max-width: 100%; display: none;" />
+    <label for="art">Prompt:</label>
+    <input type="text" id="art" name="art" required><br><br>
 
-    <label>Style (e.g., surrealism, brutalism):
-      <input id="style" type="text" placeholder="e.g., surrealism" />
-    </label>
+    <label for="style">Critique Style:</label>
+    <select id="style" name="style">
+      <option value="constructive">Constructive</option>
+      <option value="detailed">Detailed</option>
+      <option value="brief">Brief</option>
+    </select><br><br>
 
-    <button type="submit">Get Critique</button>
-    <div id="response" style="white-space: pre-wrap;"></div>
+    <button type="submit">Submit for Critique</button>
   </form>
-</section>
 
-<footer>&copy; 2025 Art Buddy – Designed for artists, students, and creatives.</footer>
-<script src="frontend/index.js"></script>
+  <div id="response" style="margin-top:20px; font-weight: bold;"></div>
+
+  <!-- ✅ Load script AFTER HTML elements -->
+  <script src="script.js"></script>
 </body>
 </html>
