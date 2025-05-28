@@ -1,38 +1,84 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const apiUrl = "https://us-central1-ai-art-critique-460706.cloudfunctions.net/generate_art_critique";
+import functions_framework
+from flask import request, jsonify, make_response
+from werkzeug.utils import secure_filename
+import openai
+import os
+import base64
+import tempfile
+from prompts import system_message, generate_prompt, format_openai_messages
 
-  const form = document.getElementById("critique-form");
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-  if (!form) {
-    console.error("critique-form not found in DOM");
-    return;
-  }
+@functions_framework.http
+def generate_art_critique(request):
+    # Handle CORS preflight
+    if request.method == 'OPTIONS':
+        response = make_response()
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        response.headers['Access-Control-Max-Age'] = '3600'
+        return response
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+    try:
+        # Validate input
+        if 'file' not in request.files:
+            return make_json_response({"error": "No image uploaded"}, 400)
 
-    const fileInput = document.getElementById("file");
-    const promptInput = document.getElementById("art");
-    const styleInput = document.getElementById("style");
-    const responseDisplay = document.getElementById("response");
+        file = request.files['file']
+        critique_type = request.form.get("prompt", "")
+        style = request.form.get("style", "constructive")
 
-    const formData = new FormData();
-    formData.append("prompt", promptInput.value);
-    formData.append("style", styleInput.value);
-    formData.append("file", fileInput.files[0]);
+        if not critique_type:
+            return make_json_response({"error": "No critique prompt provided"}, 400)
 
-    responseDisplay.textContent = "Processing...";
+        # Save image to a temp file
+        filename = secure_filename(file.filename)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=filename) as tmp:
+            file.save(tmp.name)
+            image_path = tmp.name
 
-    try {
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        body: formData,
-      });
+        # Encode image to base64
+        with open(image_path, "rb") as img_file:
+            base64_image = base64.b64encode(img_file.read()).decode("utf-8")
 
-      const result = await response.json();
-      responseDisplay.textContent = result.response || result.error;
-    } catch (err) {
-      responseDisplay.textContent = "Something went wrong: " + err.message;
-    }
-  });
-});
+        # Generate prompt and messages
+        user_prompt = generate_prompt(critique_type, style)
+        messages = [
+            {"role": "system", "content": system_message},
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": user_prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{base64_image}"
+                        }
+                    }
+                ]
+            }
+        ]
+
+        # Call OpenAI API
+        response = openai.ChatCompletion.create(
+            model="gpt-4o",
+            messages=messages,
+            max_tokens=500
+        )
+
+        result = response.choices[0].message["content"]
+
+        # Clean up file
+        os.remove(image_path)
+
+        return make_json_response({"response": result})
+
+    except Exception as e:
+        return make_json_response({"error": str(e)}, 500)
+
+
+def make_json_response(data, status=200):
+    response = make_response(jsonify(data), status)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
