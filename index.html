@@ -1,33 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Art Critique</title>
-</head>
-<body>
-  <h1>AI Art Critique</h1>
+document.addEventListener("DOMContentLoaded", function () {
+  const apiUrl = "https://us-central1-ai-art-critique-460706.cloudfunctions.net/generate_art_critique";
 
-  <form id="critique-form">
-    <label for="file">Upload Image:</label>
-    <input type="file" id="file" name="file" required><br><br>
+  const form = document.getElementById("critique-form");
 
-    <label for="art">Prompt:</label>
-    <input type="text" id="art" name="art" required><br><br>
+  if (!form) {
+    console.error("critique-form not found in DOM");
+    return;
+  }
 
-    <label for="style">Critique Style:</label>
-    <select id="style" name="style">
-      <option value="constructive">Constructive</option>
-      <option value="detailed">Detailed</option>
-      <option value="brief">Brief</option>
-    </select><br><br>
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-    <button type="submit">Submit for Critique</button>
-  </form>
+    const fileInput = document.getElementById("file");
+    const promptInput = document.getElementById("art");
+    const styleInput = document.getElementById("style");
+    const responseDisplay = document.getElementById("response");
 
-  <div id="response" style="margin-top:20px; font-weight: bold;"></div>
+    const formData = new FormData();
+    formData.append("prompt", promptInput.value);
+    formData.append("style", styleInput.value);
+    formData.append("file", fileInput.files[0]);
 
-  <!-- ✅ Load script AFTER HTML elements -->
-  <script src="script.js"></script>
-</body>
-</html>
+    responseDisplay.textContent = "Processing...";
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      responseDisplay.textContent = result.response || result.error;
+    } catch (err) {
+      responseDisplay.textContent = "Something went wrong: " + err.message;
+    }
+  });
+});
