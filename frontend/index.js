@@ -2,7 +2,7 @@
 // This code handles the form submission and sends the data to the Cloud Function
 
 // Replace this with your actual deployed Cloud Function URL
-const apiUrl = "https://us-central1-ai-art-critique-460706.cloudfunctions.net/api/critique";
+const endpoint = "https://us-central1-ai-art-critique-460706.cloudfunctions.net/generate_art_critique";
 
 document.getElementById("critique-form").addEventListener("submit", async (e) => {
   e.preventDefault();

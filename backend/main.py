@@ -1,10 +1,5 @@
-#main.py
-
-#coors not working for UI NEEDS update for response....
-
-
 import functions_framework
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from werkzeug.utils import secure_filename
 import openai
 import os
@@ -16,17 +11,26 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @functions_framework.http
 def generate_art_critique(request):
+    # Handle CORS preflight
+    if request.method == 'OPTIONS':
+        response = make_response()
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        response.headers['Access-Control-Max-Age'] = '3600'
+        return response
+
     try:
         # Validate input
         if 'file' not in request.files:
-            return jsonify({"error": "No image uploaded"}), 400
+            return make_json_response({"error": "No image uploaded"}, 400)
 
         file = request.files['file']
         critique_type = request.form.get("prompt", "")
         style = request.form.get("style", "constructive")
 
         if not critique_type:
-            return jsonify({"error": "No critique prompt provided"}), 400
+            return make_json_response({"error": "No critique prompt provided"}, 400)
 
         # Save image to a temp file
         filename = secure_filename(file.filename)
@@ -68,7 +72,13 @@ def generate_art_critique(request):
         # Clean up file
         os.remove(image_path)
 
-        return jsonify({"response": result})
+        return make_json_response({"response": result})
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return make_json_response({"error": str(e)}, 500)
+
+
+def make_json_response(data, status=200):
+    response = make_response(jsonify(data), status)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
